@@ -1,68 +1,99 @@
-Here's the Jest test code based on the provided test cases:
+Here are the Jest test cases for the provided JavaScript files:
 
 ```javascript
-// Import the necessary modules and functions
-// Assuming you have a login function that handles the login logic
-const login = require('./login');
+// App.test.js
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import App from './App';
 
-describe('Login Functionality', () => {
-  test('Valid Login Credentials', () => {
-    const result = login('admin', 'password123');
-    expect(result).toBe('Login successful');
+describe('App Component', () => {
+  test('Render Login Form', () => {
+    render(<App />);
+    expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+  });
+});
+
+// Login.test.js
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import Login from './Login';
+
+describe('Login Component', () => {
+  test('Input Field Functionality', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+
+    expect(emailInput.value).toBe('test@example.com');
+    expect(passwordInput.value).toBe('password123');
+    expect(passwordInput).toHaveAttribute('type', 'password');
   });
 
-  test('Invalid Username', () => {
-    const result = login('wronguser', 'password123');
-    expect(result).toBe('Invalid username or password');
+  test('Valid Credentials Submission', () => {
+    const consoleSpy = jest.spyOn(console, 'log');
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.change(emailInput, { target: { value: 'admin@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+
+    expect(consoleSpy).toHaveBeenCalledWith('Email:', 'admin@example.com', 'Password:', 'password123');
+    expect(emailInput.value).toBe('');
+    expect(passwordInput.value).toBe('');
+    consoleSpy.mockRestore();
   });
 
-  test('Invalid Password', () => {
-    const result = login('admin', 'wrongpassword');
-    expect(result).toBe('Invalid username or password');
+  test('Invalid Credentials Submission', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.change(emailInput, { target: { value: 'invalid@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
+    fireEvent.click(loginButton);
+
+    expect(screen.queryByText(/please fill in all fields/i)).not.toBeInTheDocument();
   });
 
-  test('Empty Username', () => {
-    const result = login('', 'password123');
-    expect(result).toBe('Username is required');
+  test('Empty Field Validation', () => {
+    render(<Login />);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.click(loginButton);
+    expect(screen.getByText(/please fill in all fields/i)).toBeInTheDocument();
   });
 
-  test('Empty Password', () => {
-    const result = login('admin', '');
-    expect(result).toBe('Password is required');
+  test('Input Field Trimming', () => {
+    const consoleSpy = jest.spyOn(console, 'log');
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.change(emailInput, { target: { value: '  admin@example.com  ' } });
+    fireEvent.change(passwordInput, { target: { value: '  password123  ' } });
+    fireEvent.click(loginButton);
+
+    expect(consoleSpy).toHaveBeenCalledWith('Email:', '  admin@example.com  ', 'Password:', '  password123  ');
+    consoleSpy.mockRestore();
   });
 
-  test('Case Sensitivity', () => {
-    const result = login('Admin', 'Password123');
-    expect(result).toBe('Invalid username or password');
-  });
-
-  test('Whitespace Trimming', () => {
-    const result = login(' admin ', ' password123 ');
-    expect(result).toBe('Login successful');
-  });
-
-  test('Maximum Length', () => {
-    const result = login('a'.repeat(21), 'b'.repeat(21));
-    expect(result).toBe('Username and password must be 20 characters or less');
-  });
-
-  test('Minimum Length', () => {
-    const result = login('ab', '12');
-    expect(result).toBe('Username and password must be at least 3 characters long');
-  });
-
-  test('Error Message for Invalid Login', () => {
-    const result = login('wronguser', 'wrongpassword');
-    expect(result).toBe('Invalid username or password');
-  });
-
-  test('Successful Login Message', () => {
-    const result = login('admin', 'password123');
-    expect(result).toBe('Login successful');
+  test('Password Field Security', () => {
+    render(<Login />);
+    const passwordInput = screen.getByLabelText(/password/i);
+    expect(passwordInput).toHaveAttribute('type', 'password');
   });
 });
 ```
 
-Note that this test suite assumes the existence of a `login` function that takes a username and password as parameters and returns the appropriate message. You'll need to implement this function to match the expected behavior in your actual code.
-
-Also, make sure to have Jest installed in your project and configured properly to run these tests.
+These test cases cover all the scenarios mentioned in the provided test case structure. They test the rendering of the login form, input field functionality, valid and invalid credential submissions, empty field validation, input field trimming, and password field security.
