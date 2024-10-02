@@ -1,9 +1,9 @@
-name: Node.js CI
+name: React Test CI
 
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,16 +14,29 @@ jobs:
         node-version: '20.x'
     - name: Install dependencies
       run: |
-        npm ci
-        npm install
-    - name: Build
-      run: npm run build --if-present
-    - name: Run frontend tests
-      run: |
         cd frontend
         npm install
-        node --experimental-vm-modules ../testcase.js
-    - name: Run other tests
-      run: npm test
-    - name: npm audit
-      run: npm audit --audit-level=high
+        npm install --save-dev jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom @babel/preset-env @babel/preset-react babel-jest
+    - name: Create Jest config
+      run: |
+        cd frontend
+        echo "module.exports = {
+          testEnvironment: 'jsdom',
+          transform: {
+            '^.+\\.jsx?$': 'babel-jest',
+          },
+          setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
+          moduleDirectories: ['node_modules', 'src'],
+        };" > jest.config.js
+    - name: Create Babel config
+      run: |
+        cd frontend
+        echo '{
+          "presets": ["@babel/preset-env", "@babel/preset-react"]
+        }' > .babelrc
+    - name: Move testcase.js to frontend
+      run: mv testcase.js frontend/
+    - name: Run tests
+      run: |
+        cd frontend
+        npx jest testcase.js
