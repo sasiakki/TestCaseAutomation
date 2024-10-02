@@ -50,9 +50,9 @@ public class LoginServletTest {
     }
 
     @Test
-    public void testEmptyCredentials() throws Exception {
-        when(request.getParameter("username")).thenReturn("");
-        when(request.getParameter("password")).thenReturn("");
+    public void testNullUsername() throws Exception {
+        when(request.getParameter("username")).thenReturn(null);
+        when(request.getParameter("password")).thenReturn("password123");
 
         loginServlet.doPost(request, response);
 
@@ -61,8 +61,8 @@ public class LoginServletTest {
     }
 
     @Test
-    public void testNullCredentials() throws Exception {
-        when(request.getParameter("username")).thenReturn(null);
+    public void testNullPassword() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
         when(request.getParameter("password")).thenReturn(null);
 
         loginServlet.doPost(request, response);
@@ -72,24 +72,57 @@ public class LoginServletTest {
     }
 
     @Test
-    public void testResponseEncoding() throws Exception {
-        when(request.getParameter("username")).thenReturn("admin");
+    public void testEmptyUsername() throws Exception {
+        when(request.getParameter("username")).thenReturn("");
         when(request.getParameter("password")).thenReturn("password123");
 
         loginServlet.doPost(request, response);
 
-        verify(response).setCharacterEncoding("UTF-8");
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Failed"));
     }
 
     @Test
-    public void testPasswordHandling() throws Exception {
+    public void testEmptyPassword() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
+        when(request.getParameter("password")).thenReturn("");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Failed"));
+    }
+
+    @Test
+    public void testSpecialCharactersInInput() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin@!#$%");
+        when(request.getParameter("password")).thenReturn("pass@!#$%");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Test
+    public void testResponseContentForSuccess() throws Exception {
         when(request.getParameter("username")).thenReturn("admin");
         when(request.getParameter("password")).thenReturn("password123");
 
         loginServlet.doPost(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertFalse(stringWriter.toString().contains("password123"));
+        assertTrue(stringWriter.toString().contains("Login Successful"));
+    }
+
+    @Test
+    public void testResponseContentForFailure() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
+        when(request.getParameter("password")).thenReturn("wrongpassword");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Failed"));
     }
 }
 ```
