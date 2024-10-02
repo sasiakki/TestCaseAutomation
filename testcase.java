@@ -1,56 +1,85 @@
-Here's the Jest test code based on the provided test cases:
+Here's the JUnit test code for the LoginServlet class based on the provided requirements:
 
-```javascript
-const request = require('supertest');
-const app = require('./app'); // Assuming your main application file is named app.js
+```java
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
-describe('Login Tests', () => {
-  test('Successful Login Test', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({ username: 'admin', password: 'password123' });
-    expect(response.status).toBe(200);
-    expect(response.text).toBe('Login successful!');
-  });
+import java.io.*;
+import javax.servlet.http.*;
+import org.junit.*;
+import org.mockito.*;
 
-  test('Failed Login Test - Incorrect Password', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({ username: 'admin', password: 'wrongpassword' });
-    expect(response.status).toBe(401);
-    expect(response.text).toBe('Login failed. Invalid username or password.');
-  });
+public class LoginServletTest {
 
-  test('Failed Login Test - Incorrect Username', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({ username: 'wronguser', password: 'password123' });
-    expect(response.status).toBe(401);
-    expect(response.text).toBe('Login failed. Invalid username or password.');
-  });
+    private LoginServlet loginServlet;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private StringWriter stringWriter;
+    private PrintWriter writer;
 
-  test('Empty Input Test', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({ username: '', password: '' });
-    expect(response.status).toBe(400);
-    expect(response.text).toBe('Username and password cannot be empty.');
-  });
+    @Before
+    public void setUp() throws Exception {
+        loginServlet = new LoginServlet();
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
+        stringWriter = new StringWriter();
+        writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
+    }
 
-  test('SQL Injection Test', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({ username: "admin' --", password: 'anything' });
-    expect(response.status).toBe(401);
-    expect(response.text).toBe('Login failed. Invalid username or password.');
-  });
+    @Test
+    public void testSuccessfulLogin() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
+        when(request.getParameter("password")).thenReturn("password123");
 
-  test('HTML Response Structure Test', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({ username: 'admin', password: 'password123' });
-    expect(response.status).toBe(200);
-    expect(response.text).toBe('<html><body><h2>Login successful!</h2></body></html>');
-  });
-});
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Successful"));
+    }
+
+    @Test
+    public void testFailedLogin() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
+        when(request.getParameter("password")).thenReturn("wrongpassword");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Failed"));
+    }
+
+    @Test
+    public void testNullUsername() throws Exception {
+        when(request.getParameter("username")).thenReturn(null);
+        when(request.getParameter("password")).thenReturn("password123");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Failed"));
+    }
+
+    @Test
+    public void testEmptyPassword() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
+        when(request.getParameter("password")).thenReturn("");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Failed"));
+    }
+
+    @Test
+    public void testInputValidation() throws Exception {
+        when(request.getParameter("username")).thenReturn("<script>alert('xss')</script>");
+        when(request.getParameter("password")).thenReturn("password123");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(stringWriter.toString().contains("Login Failed"));
+    }
+}
 ```
