@@ -30,6 +30,7 @@ jobs:
           },
           setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
           moduleDirectories: ['node_modules', 'src'],
+          testMatch: ['**/testcase.js'],
         };" > jest.config.js
 
     - name: Create setup file for Jest
@@ -44,7 +45,16 @@ jobs:
           "presets": ["@babel/preset-env", "@babel/preset-react"]
         }' > .babelrc
 
+    - name: Copy testcase.js to frontend directory
+      run: cp testcase.js frontend/
+
+    - name: Check frontend directory contents
+      run: |
+        cd frontend
+        ls -la
+        cat testcase.js
+
     - name: Run tests
       run: |
         cd frontend
-        npx jest testcase.js
+        npx jest --config jest.config.js
