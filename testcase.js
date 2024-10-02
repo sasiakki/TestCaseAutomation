@@ -1,6 +1,3 @@
-Here are the Jest test cases for the JavaScript files in the 'frontend' folder:
-
-```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Login from './Login';
@@ -57,4 +54,3 @@ describe('Login component', () => {
     expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
   });
 });
-```
