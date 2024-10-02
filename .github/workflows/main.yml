@@ -2,6 +2,7 @@ name: React Test CI
 
 on: [push]
 
+
 jobs:
   test:
     runs-on: ubuntu-latest
