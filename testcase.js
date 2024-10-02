@@ -1,4 +1,4 @@
-Here are the Jest test cases for the login form based on the provided specifications:
+Here's the Jest test code for the login component based on the provided specifications:
 
 ```javascript
 import React from 'react';
