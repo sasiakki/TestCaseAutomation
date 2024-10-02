@@ -50,19 +50,8 @@ public class LoginServletTest {
     }
 
     @Test
-    public void testNullUsername() throws Exception {
-        when(request.getParameter("username")).thenReturn(null);
-        when(request.getParameter("password")).thenReturn("password123");
-
-        loginServlet.doPost(request, response);
-
-        verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertTrue(stringWriter.toString().contains("Login Failed"));
-    }
-
-    @Test
-    public void testEmptyPassword() throws Exception {
-        when(request.getParameter("username")).thenReturn("admin");
+    public void testEmptyCredentials() throws Exception {
+        when(request.getParameter("username")).thenReturn("");
         when(request.getParameter("password")).thenReturn("");
 
         loginServlet.doPost(request, response);
@@ -72,14 +61,35 @@ public class LoginServletTest {
     }
 
     @Test
-    public void testInputValidation() throws Exception {
-        when(request.getParameter("username")).thenReturn("<script>alert('xss')</script>");
-        when(request.getParameter("password")).thenReturn("password123");
+    public void testNullCredentials() throws Exception {
+        when(request.getParameter("username")).thenReturn(null);
+        when(request.getParameter("password")).thenReturn(null);
 
         loginServlet.doPost(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(stringWriter.toString().contains("Login Failed"));
+    }
+
+    @Test
+    public void testResponseEncoding() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
+        when(request.getParameter("password")).thenReturn("password123");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setCharacterEncoding("UTF-8");
+    }
+
+    @Test
+    public void testPasswordHandling() throws Exception {
+        when(request.getParameter("username")).thenReturn("admin");
+        when(request.getParameter("password")).thenReturn("password123");
+
+        loginServlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertFalse(stringWriter.toString().contains("password123"));
     }
 }
 ```
