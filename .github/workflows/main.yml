@@ -14,35 +14,47 @@ jobs:
       with:
         node-version: '20.x'
 
-    - name: Setup and Run Tests
+    - name: Install dependencies
       run: |
-        # Navigate to frontend directory
         cd frontend
-
-        # Install dependencies
         npm install
-        npm install --save-dev jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom @babel/core @babel/preset-env @babel/preset-react babel-jest react react-dom
+        npm install --save-dev jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom @babel/preset-env @babel/preset-react babel-jest
 
-        # Create Babel config
+    - name: Create Jest config
+      run: |
+        cd frontend
+        echo "module.exports = {
+          testEnvironment: 'jsdom',
+          transform: {
+            '^.+\\.jsx?$': 'babel-jest',
+          },
+          setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
+          moduleDirectories: ['node_modules', 'src'],
+          testMatch: ['**/testcase.js'],
+        };" > jest.config.js
+
+    - name: Create setup file for Jest
+      run: |
+        cd frontend
+        echo "import '@testing-library/jest-dom';" > setupTests.js
+
+    - name: Create Babel config
+      run: |
+        cd frontend
         echo '{
           "presets": ["@babel/preset-env", "@babel/preset-react"]
         }' > .babelrc
 
-        # Create Jest config
-        echo '{
-          "testEnvironment": "jsdom",
-          "transform": {
-            "^.+\\.jsx?$": "babel-jest"
-          },
-          "setupFilesAfterEnv": ["<rootDir>/setupTests.js"],
-          "moduleDirectories": ["node_modules", "src"]
-        }' > jest.config.json
+    - name: Copy testcase.js to frontend directory
+      run: cp testcase.js frontend/
 
-        # Create setup file for Jest
-        echo "import '@testing-library/jest-dom';" > setupTests.js
+    - name: Check frontend directory contents
+      run: |
+        cd frontend
+        ls -la
+        cat testcase.js
 
-        # Copy testcase.js from root to frontend directory
-        cp ../testcase.js .
-
-        # Run the tests
-        npx jest --config=jest.config.json testcase.js
+    - name: Run tests
+      run: |
+        cd frontend
+        npx jest --config jest.config.js
