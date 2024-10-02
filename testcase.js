@@ -1,11 +1,8 @@
-Here's the Jest test code for the Login component based on the specifications provided:
-
-```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Login from './Login';
 
-describe('Login Component', () => {
+describe('Login component', () => {
   const setup = () => {
     render(<Login />);
     const usernameInput = screen.getByPlaceholderText('Enter your email');
@@ -60,7 +57,7 @@ describe('Login Component', () => {
 
   test('case-sensitivity of the username', () => {
     const { usernameInput, passwordInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: 'ADMIN' } });
+    fireEvent.change(usernameInput, { target: { value: 'Admin' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
     expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
@@ -69,7 +66,7 @@ describe('Login Component', () => {
   test('case-sensitivity of the password', () => {
     const { usernameInput, passwordInput, loginButton } = setup();
     fireEvent.change(usernameInput, { target: { value: 'admin' } });
-    fireEvent.change(passwordInput, { target: { value: 'PASSWORD123' } });
+    fireEvent.change(passwordInput, { target: { value: 'Password123' } });
     fireEvent.click(loginButton);
     expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
   });
@@ -82,4 +79,3 @@ describe('Login Component', () => {
     expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
   });
 });
-```
