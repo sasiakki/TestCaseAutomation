@@ -1,4 +1,4 @@
-Here's the Jest test code for the Login component based on the specifications provided:
+Here are the Jest test cases for the login form based on the specifications provided:
 
 ```javascript
 import React from 'react';
@@ -6,50 +6,65 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Login from './Login';
 
 describe('Login Component', () => {
-  test('renders login form', () => {
+  const setup = () => {
     render(<Login />);
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    const usernameInput = screen.getByLabelText(/username/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+    return { usernameInput, passwordInput, loginButton };
+  };
+
+  const login = (username, password) => {
+    const { usernameInput, passwordInput, loginButton } = setup();
+    fireEvent.change(usernameInput, { target: { value: username } });
+    fireEvent.change(passwordInput, { target: { value: password } });
+    fireEvent.click(loginButton);
+  };
+
+  test('valid login credentials', () => {
+    login('admin', 'password123');
+    expect(screen.queryByText(/invalid credentials/i)).not.toBeInTheDocument();
   });
 
-  test('renders username and password fields', () => {
-    render(<Login />);
-    expect(screen.getByLabelText('Email:')).toBeInTheDocument();
-    expect(screen.getByLabelText('Password:')).toBeInTheDocument();
+  test('invalid username', () => {
+    login('invaliduser', 'password123');
+    expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
   });
 
-  test('renders login button', () => {
-    render(<Login />);
-    expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
+  test('invalid password', () => {
+    login('admin', 'wrongpassword');
+    expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
   });
 
-  test('validates correct credentials', () => {
-    render(<Login />);
-    fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'admin' } });
-    fireEvent.change(screen.getByLabelText('Password:'), { target: { value: 'password123' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+  test('empty username field', () => {
+    login('', 'password123');
+    expect(screen.getByText(/username is required/i)).toBeInTheDocument();
   });
 
-  test('validates incorrect username', () => {
-    render(<Login />);
-    fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'wronguser' } });
-    fireEvent.change(screen.getByLabelText('Password:'), { target: { value: 'password123' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+  test('empty password field', () => {
+    login('admin', '');
+    expect(screen.getByText(/password is required/i)).toBeInTheDocument();
   });
 
-  test('validates incorrect password', () => {
-    render(<Login />);
-    fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'admin' } });
-    fireEvent.change(screen.getByLabelText('Password:'), { target: { value: 'wrongpassword' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+  test('empty username and password fields', () => {
+    login('', '');
+    expect(screen.getByText(/username is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/password is required/i)).toBeInTheDocument();
   });
 
-  test('validates empty fields', () => {
-    render(<Login />);
-    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
-    expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
+  test('case-sensitivity of the username', () => {
+    login('ADMIN', 'password123');
+    expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
+  });
+
+  test('case-sensitivity of the password', () => {
+    login('admin', 'PASSWORD123');
+    expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
+  });
+
+  test('trimming of whitespace in username and password', () => {
+    login(' admin ', ' password123 ');
+    expect(screen.queryByText(/invalid credentials/i)).not.toBeInTheDocument();
   });
 });
 ```
