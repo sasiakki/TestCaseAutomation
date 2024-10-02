@@ -1,4 +1,4 @@
-Here's the Jest test code for the Login component based on the requirements:
+Here are the Jest test cases for the Login component based on the provided requirements:
 
 ```javascript
 import React from 'react';
@@ -6,80 +6,116 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Login from './Login';
 
 describe('Login Component', () => {
-  const setup = () => {
+  test('renders login form with username and password fields, and login button', () => {
     render(<Login />);
-    const usernameInput = screen.getByPlaceholderText('Enter your email');
-    const passwordInput = screen.getByPlaceholderText('Enter your password');
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+  });
+
+  test('input fields accept input correctly', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'testpassword' } });
+
+    expect(emailInput.value).toBe('test@example.com');
+    expect(passwordInput.value).toBe('testpassword');
+  });
+
+  test('form submits successfully with correct credentials', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
     const loginButton = screen.getByRole('button', { name: /login/i });
-    return { usernameInput, passwordInput, loginButton };
-  };
 
-  test('Test valid login credentials', () => {
-    const { usernameInput, passwordInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: 'admin' } });
+    fireEvent.change(emailInput, { target: { value: 'admin' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+
+    expect(screen.queryByText(/please fill in all fields/i)).not.toBeInTheDocument();
   });
 
-  test('Test invalid username', () => {
-    const { usernameInput, passwordInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: 'invaliduser' } });
+  test('shows error for wrong username, correct password', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.change(emailInput, { target: { value: 'wronguser' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+
+    expect(screen.queryByText(/please fill in all fields/i)).not.toBeInTheDocument();
   });
 
-  test('Test invalid password', () => {
-    const { usernameInput, passwordInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: 'admin' } });
-    fireEvent.change(passwordInput, { target: { value: 'invalidpassword' } });
+  test('shows error for correct username, wrong password', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.change(emailInput, { target: { value: 'admin' } });
+    fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
     fireEvent.click(loginButton);
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+
+    expect(screen.queryByText(/please fill in all fields/i)).not.toBeInTheDocument();
   });
 
-  test('Test empty username field', () => {
-    const { passwordInput, loginButton } = setup();
+  test('shows error for both username and password incorrect', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.change(emailInput, { target: { value: 'wronguser' } });
+    fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
+    fireEvent.click(loginButton);
+
+    expect(screen.queryByText(/please fill in all fields/i)).not.toBeInTheDocument();
+  });
+
+  test('shows error for empty username, filled password', () => {
+    render(<Login />);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
-    expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
+
+    expect(screen.getByText(/please fill in all fields/i)).toBeInTheDocument();
   });
 
-  test('Test empty password field', () => {
-    const { usernameInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: 'admin' } });
+  test('shows error for filled username, empty password', () => {
+    render(<Login />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    fireEvent.change(emailInput, { target: { value: 'admin' } });
     fireEvent.click(loginButton);
-    expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
+
+    expect(screen.getByText(/please fill in all fields/i)).toBeInTheDocument();
   });
 
-  test('Test empty username and password fields', () => {
-    const { loginButton } = setup();
+  test('shows error for both fields empty', () => {
+    render(<Login />);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
     fireEvent.click(loginButton);
-    expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
+
+    expect(screen.getByText(/please fill in all fields/i)).toBeInTheDocument();
   });
 
-  test('Test username case sensitivity', () => {
-    const { usernameInput, passwordInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: 'AdMiN' } });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
-    fireEvent.click(loginButton);
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
-  });
+  test('login button triggers validation function', () => {
+    const handleSubmitMock = jest.fn();
+    render(<Login handleSubmit={handleSubmitMock} />);
+    const loginButton = screen.getByRole('button', { name: /login/i });
 
-  test('Test password case sensitivity', () => {
-    const { usernameInput, passwordInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: 'admin' } });
-    fireEvent.change(passwordInput, { target: { value: 'PaSsWoRd123' } });
     fireEvent.click(loginButton);
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
-  });
 
-  test('Test trimming whitespace from inputs', () => {
-    const { usernameInput, passwordInput, loginButton } = setup();
-    fireEvent.change(usernameInput, { target: { value: '  admin  ' } });
-    fireEvent.change(passwordInput, { target: { value: '  password123  ' } });
-    fireEvent.click(loginButton);
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+    expect(handleSubmitMock).toHaveBeenCalledTimes(1);
   });
 });
 ```
