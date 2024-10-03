@@ -1,61 +1,38 @@
-name: React Test CI
-
-on: [push]
-
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-
-    - name: Install dependencies
-      run: |
-        cd frontend
-        npm install
-        npm install --save-dev jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom @babel/preset-env @babel/preset-react babel-jest
-
-    - name: Create Jest config
-      run: |
-        cd frontend
-        echo "module.exports = {
-          testEnvironment: 'jsdom',
-          transform: {
-          '^.+\\.jsx?$': 'babel-jest',
-        },
-          setupFilesAfterEnv: ['./frontend/setupTests.js'],
-          moduleDirectories: ['node_modules', 'src'],
-          testMatch: ['**/testcase.js'],
-        };" > jest.config.js
-
-    - name: Create setup file for Jest
-      run: |
-        cd frontend
-        echo "import '@testing-library/jest-dom';" > setupTests.js
-
-    - name: Create Babel config
-      run: |
-        cd frontend
-        echo '{
-          "presets": ["@babel/preset-env", "@babel/preset-react"]
-        }' > .babelrc
-
-    - name: Copy testcase.js to frontend directory
-      run: cp testcase.js frontend/
-
-    - name: Check frontend directory contents
-      run: |
-        cd frontend
-        ls -la
-        cat testcase.js
-
-    - name: Run tests
-      run: |
-        cd frontend
-        npx jest --config jest.config.js
+{
+  "name": "login-page",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "jest",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
