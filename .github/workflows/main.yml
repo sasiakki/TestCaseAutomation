@@ -14,6 +14,10 @@ jobs:
         cd frontend
         npm install
         npm install --save-dev identity-obj-proxy @babel/preset-env @babel/preset-react
+    - name: Update @testing-library/react
+      run: |
+        cd frontend
+        npm install --save-dev @testing-library/react@latest
     - name: Create Jest config
       run: |
         cd frontend
@@ -37,6 +41,18 @@ jobs:
         cd frontend
         mkdir -p __mocks__
         echo "module.exports = 'test-file-stub';" > __mocks__/fileMock.js
+    - name: Update App.test.js
+      run: |
+        cd frontend
+        echo "import React from 'react';
+        import { render, screen } from '@testing-library/react';
+        import App from './App';
+
+        test('renders learn react link', () => {
+          render(<App />);
+          const linkElement = screen.getByText(/learn react/i);
+          expect(linkElement).toBeInTheDocument();
+        });" > App.test.js
     - name: Run all tests with Jest
       run: |
         cd frontend
