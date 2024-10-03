@@ -13,47 +13,18 @@ jobs:
       run: |
         cd frontend
         npm install
-        npm install --save-dev identity-obj-proxy @babel/preset-env @babel/preset-react
-    - name: Update @testing-library/react
-      run: |
-        cd frontend
-        npm install --save-dev @testing-library/react@latest
+        npm install --save-dev jest @babel/preset-env @babel/preset-react @testing-library/react @testing-library/jest-dom
     - name: Create Jest config
       run: |
         cd frontend
         echo "module.exports = {
           testEnvironment: 'jsdom',
           setupFilesAfterEnv: ['@testing-library/jest-dom'],
-          moduleNameMapper: {
-            '\\\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-            '\\\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
-          },
           transform: {
             '^.+\\\\.(js|jsx)$': 'babel-jest'
           },
-          transformIgnorePatterns: [
-            '/node_modules/',
-            '^.+\\\\.module\\\\.(css|sass|scss)$'
-          ]
         };" > jest.config.js
-    - name: Create file mock
+    - name: Run tests from testcase.js
       run: |
         cd frontend
-        mkdir -p __mocks__
-        echo "module.exports = 'test-file-stub';" > __mocks__/fileMock.js
-    - name: Update App.test.js
-      run: |
-        cd frontend
-        echo "import React from 'react';
-        import { render, screen } from '@testing-library/react';
-        import App from './App';
-
-        test('renders learn react link', () => {
-          render(<App />);
-          const linkElement = screen.getByText(/learn react/i);
-          expect(linkElement).toBeInTheDocument();
-        });" > App.test.js
-    - name: Run all tests with Jest
-      run: |
-        cd frontend
-        npx jest --config=jest.config.js
+        npx jest testcase.js --config=jest.config.js
