@@ -14,6 +14,18 @@ jobs:
         cd frontend
         npm install
         npm install --save-dev jest @babel/preset-env @babel/preset-react @testing-library/react @testing-library/jest-dom
+    - name: List frontend directory contents
+      run: |
+        cd frontend
+        ls -la
+    - name: Display testcase.js content (if it exists)
+      run: |
+        cd frontend
+        if [ -f testcase.js ]; then
+          cat testcase.js
+        else
+          echo "testcase.js not found in frontend directory"
+        fi
     - name: Create Jest config
       run: |
         cd frontend
@@ -23,8 +35,9 @@ jobs:
           transform: {
             '^.+\\\\.(js|jsx)$': 'babel-jest'
           },
+          testMatch: ['**/testcase.js']
         };" > jest.config.js
     - name: Run tests from testcase.js
       run: |
         cd frontend
-        npx jest testcase.js --config=jest.config.js
+        npx jest --config=jest.config.js
