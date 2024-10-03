@@ -1,4 +1,4 @@
-Here are the Jest test cases for the Login component based on the provided code and requirements:
+Here's the Jest test code for the Login component based on the specifications provided:
 
 ```javascript
 import React from 'react';
@@ -23,11 +23,11 @@ describe('Login component', () => {
     const emailInput = screen.getByPlaceholderText('Enter your email');
     const passwordInput = screen.getByPlaceholderText('Enter your password');
 
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'testpassword' } });
+    fireEvent.change(emailInput, { target: { value: 'admin' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-    expect(emailInput.value).toBe('test@example.com');
-    expect(passwordInput.value).toBe('testpassword');
+    expect(emailInput.value).toBe('admin');
+    expect(passwordInput.value).toBe('password123');
   });
 
   it('Should successfully log in with valid credentials', () => {
@@ -84,3 +84,5 @@ describe('Login component', () => {
   });
 });
 ```
+
+This test code covers all the specified scenarios, including rendering of the login form, input field functionality, validation of correct credentials, handling of incorrect credentials, empty field validation, and button click functionality.
