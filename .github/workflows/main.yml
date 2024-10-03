@@ -13,27 +13,11 @@ jobs:
       run: |
         cd frontend
         npm install
-        npm install --save-dev @testing-library/react @testing-library/jest-dom react-scripts
-    - name: Verify package installations
+    - name: Run all tests with Jest
       run: |
         cd frontend
-        npm ls @testing-library/react @testing-library/jest-dom react-scripts
-    - name: Create Jest config
+        npx jest --config=jest.config.js
+    - name: Run all tests with React Scripts
       run: |
         cd frontend
-        echo "module.exports = {
-          testEnvironment: 'jsdom',
-          setupFilesAfterEnv: ['@testing-library/jest-dom'],
-        };" > jest.config.js
-    - name: Verify Simple React test file
-      run: |
-        cd frontend
-        cat SimpleComponent.test.js
-    - name: Run Jest directly
-      run: |
-        cd frontend
-        npx jest --no-cache --config=jest.config.js SimpleComponent.test.js
-    - name: Run tests with React Scripts
-      run: |
-        cd frontend
-        CI=true npm test -- --testMatch='**/SimpleComponent.test.js'
+        CI=true npm test
