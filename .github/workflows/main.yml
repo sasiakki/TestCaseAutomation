@@ -18,24 +18,22 @@ jobs:
       run: |
         cd frontend
         npm ls @testing-library/react @testing-library/jest-dom react-scripts
-    - name: Create minimal Jest config
+    - name: Create Jest config
       run: |
         cd frontend
         echo "module.exports = {
           testEnvironment: 'jsdom',
+          setupFilesAfterEnv: ['@testing-library/jest-dom'],
         };" > jest.config.js
-    - name: Create minimal test file
+    - name: Verify Simple React test file
       run: |
         cd frontend
-        echo "import '@testing-library/jest-dom';
-        test('minimal test', () => {
-          expect(true).toBe(true);
-        });" > minimal.test.js
+        cat SimpleComponent.test.js
     - name: Run Jest directly
       run: |
         cd frontend
-        npx jest --no-cache --config=jest.config.js minimal.test.js
+        npx jest --no-cache --config=jest.config.js SimpleComponent.test.js
     - name: Run tests with React Scripts
       run: |
         cd frontend
-        CI=true npm test -- --testMatch='**/minimal.test.js'
+        CI=true npm test -- --testMatch='**/SimpleComponent.test.js'
