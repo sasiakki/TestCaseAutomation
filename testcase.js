@@ -1,3 +1,6 @@
+Here are the Jest test cases for the Login component based on the provided code and requirements:
+
+```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -80,3 +83,4 @@ describe('Login component', () => {
     expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
   });
 });
+```
