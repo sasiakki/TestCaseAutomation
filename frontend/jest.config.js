@@ -4,5 +4,7 @@ module.exports = {
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest'
   },
-  testMatch: ['**/testcase.js']
+  testMatch: ['**/testcase.js'],
+  moduleDirectories: ['node_modules', 'src', '.'],
+  rootDir: 'frontend'
 };
