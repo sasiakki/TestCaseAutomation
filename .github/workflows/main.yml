@@ -13,11 +13,8 @@ jobs:
       run: |
         cd frontend
         npm install
+        npm install --save-dev identity-obj-proxy @babel/preset-env @babel/preset-react
     - name: Run all tests with Jest
       run: |
         cd frontend
         npx jest --config=jest.config.js
-    - name: Run all tests with React Scripts
-      run: |
-        cd frontend
-        CI=true npm test
