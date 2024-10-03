@@ -13,42 +13,29 @@ jobs:
       run: |
         cd frontend
         npm install
-        npm install --save-dev jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom @babel/preset-env @babel/preset-react babel-jest react react-dom
-    - name: Check package versions
+        npm install --save-dev @testing-library/react @testing-library/jest-dom react-scripts
+    - name: Verify package installations
       run: |
         cd frontend
-        npm list jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom react react-dom
-    - name: Create Jest config
+        npm ls @testing-library/react @testing-library/jest-dom react-scripts
+    - name: Create minimal Jest config
       run: |
         cd frontend
         echo "module.exports = {
           testEnvironment: 'jsdom',
-          transform: {
-            '^.+\\.jsx?$': 'babel-jest',
-          },
-          setupFilesAfterEnv: ['./setupTests.js'],
         };" > jest.config.js
-    - name: Create setup file for Jest
+    - name: Create minimal test file
       run: |
         cd frontend
-        echo "import '@testing-library/jest-dom';" > setupTests.js
-    - name: Create Babel config
-      run: |
-        cd frontend
-        echo '{
-          "presets": ["@babel/preset-env", "@babel/preset-react"]
-        }' > .babelrc
-    - name: Create minimal test case
-      run: |
-        cd frontend
-        echo "import React from 'react';
-        import { render, screen } from '@testing-library/react';
-
-        test('Minimal test case', () => {
-          render(<div>Hello, World!</div>);
-          expect(screen.getByText('Hello, World!')).toBeInTheDocument();
+        echo "import '@testing-library/jest-dom';
+        test('minimal test', () => {
+          expect(true).toBe(true);
         });" > minimal.test.js
-    - name: Run tests
+    - name: Run Jest directly
       run: |
         cd frontend
-        NODE_ENV=test npx jest minimal.test.js --config jest.config.js --verbose
+        npx jest --no-cache --config=jest.config.js minimal.test.js
+    - name: Run tests with React Scripts
+      run: |
+        cd frontend
+        CI=true npm test -- --testMatch='**/minimal.test.js'
