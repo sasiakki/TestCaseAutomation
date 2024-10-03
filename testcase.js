@@ -85,4 +85,4 @@ describe('Login component', () => {
 });
 ```
 
-This test code covers all the test cases specified in the provided JSON structure. It tests the rendering of input fields and buttons, input functionality, login success and failure scenarios, and error message display.
+This test code covers all the test cases mentioned in the provided JSON structure, including rendering of form elements, input functionality, credential validation, login button functionality, error handling, and form submission.
