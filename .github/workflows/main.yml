@@ -27,9 +27,9 @@ jobs:
         echo "module.exports = {
           testEnvironment: 'jsdom',
           transform: {
-            '^.+\\.jsx?$': 'babel-jest',
-          },
-          setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
+          '^.+\\.jsx?$': 'babel-jest',
+        },
+          setupFilesAfterEnv: ['./frontend/setupTests.js'],
           moduleDirectories: ['node_modules', 'src'],
           testMatch: ['**/testcase.js'],
         };" > jest.config.js
