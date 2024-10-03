@@ -3,7 +3,7 @@ module.exports = {
     transform: {
       '^.+\\.jsx?$': 'babel-jest',
     },
-    setupFilesAfterEnv: ['./frontend/setupTests.js'],
+    setupFilesAfterEnv: ['./setupTests.js'],
     moduleDirectories: ['node_modules', 'src'],
     testMatch: ['**/testcase.js'],
   };
