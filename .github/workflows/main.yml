@@ -14,6 +14,29 @@ jobs:
         cd frontend
         npm install
         npm install --save-dev identity-obj-proxy @babel/preset-env @babel/preset-react
+    - name: Create Jest config
+      run: |
+        cd frontend
+        echo "module.exports = {
+          testEnvironment: 'jsdom',
+          setupFilesAfterEnv: ['@testing-library/jest-dom'],
+          moduleNameMapper: {
+            '\\\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+            '\\\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
+          },
+          transform: {
+            '^.+\\\\.(js|jsx)$': 'babel-jest'
+          },
+          transformIgnorePatterns: [
+            '/node_modules/',
+            '^.+\\\\.module\\\\.(css|sass|scss)$'
+          ]
+        };" > jest.config.js
+    - name: Create file mock
+      run: |
+        cd frontend
+        mkdir -p __mocks__
+        echo "module.exports = 'test-file-stub';" > __mocks__/fileMock.js
     - name: Run all tests with Jest
       run: |
         cd frontend
