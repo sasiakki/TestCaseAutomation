@@ -16,7 +16,7 @@ jobs:
         cd frontend
         npm install
         npm install --save-dev jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom @babel/preset-env @babel/preset-react babel-jest
-    - name: Verify package installation
+    - name: Check package versions
       run: |
         cd frontend
         npm list jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom
@@ -25,6 +25,9 @@ jobs:
         cd frontend
         echo "module.exports = {
           testEnvironment: 'jsdom',
+          testEnvironmentOptions: {
+            url: 'http://localhost'
+          },
           transform: {
             '^.+\\.jsx?$': 'babel-jest',
           },
@@ -44,10 +47,6 @@ jobs:
         }' > .babelrc
     - name: Copy testcase.js to frontend directory
       run: cp testcase.js frontend/
-    - name: Check frontend directory contents
-      run: |
-        cd frontend
-        ls -la
     - name: Check testcase.js content
       run: |
         cd frontend
@@ -55,4 +54,4 @@ jobs:
     - name: Run tests
       run: |
         cd frontend
-        npx jest --config jest.config.js --verbose
+        NODE_ENV=test npx jest --config jest.config.js --verbose --detectOpenHandles
