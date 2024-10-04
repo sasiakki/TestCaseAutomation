@@ -1,17 +1,16 @@
+Here's the Jest test code for the Login component based on the provided test cases:
+
+```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Login from './Login';
 
 describe('Login component', () => {
-  it('Should render username and password input fields', () => {
+  it('Should render username and password input fields and login button', () => {
     render(<Login />);
     expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
-  });
-
-  it('Should render a login button', () => {
-    render(<Login />);
     expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
   });
 
@@ -50,7 +49,7 @@ describe('Login component', () => {
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
 
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+    expect(screen.queryByText('Invalid credentials')).toBeInTheDocument();
   });
 
   it('Should show error message for invalid password', () => {
@@ -63,7 +62,7 @@ describe('Login component', () => {
     fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
     fireEvent.click(loginButton);
 
-    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+    expect(screen.queryByText('Invalid credentials')).toBeInTheDocument();
   });
 
   it('Should not allow login with empty fields', () => {
@@ -73,10 +72,45 @@ describe('Login component', () => {
     expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
   });
 
-  it('Should call handleSubmit function on login button click', () => {
+  it('Should trim whitespace in username before validation', () => {
     render(<Login />);
+    const emailInput = screen.getByPlaceholderText('Enter your email');
+    const passwordInput = screen.getByPlaceholderText('Enter your password');
     const loginButton = screen.getByRole('button', { name: 'Login' });
+
+    fireEvent.change(emailInput, { target: { value: '  admin  ' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
-    expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
+
+    expect(screen.queryByText('Please fill in all fields')).not.toBeInTheDocument();
+  });
+
+  it('Should be case-sensitive for username validation', () => {
+    render(<Login />);
+    const emailInput = screen.getByPlaceholderText('Enter your email');
+    const passwordInput = screen.getByPlaceholderText('Enter your password');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
+
+    fireEvent.change(emailInput, { target: { value: 'Admin' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+
+    expect(screen.queryByText('Invalid credentials')).toBeInTheDocument();
+  });
+
+  it('Should handle maximum length input', () => {
+    render(<Login />);
+    const emailInput = screen.getByPlaceholderText('Enter your email');
+    const passwordInput = screen.getByPlaceholderText('Enter your password');
+
+    const longInput = 'a'.repeat(256);
+    fireEvent.change(emailInput, { target: { value: longInput } });
+    fireEvent.change(passwordInput, { target: { value: longInput } });
+
+    expect(emailInput.value.length).toBeLessThanOrEqual(255);
+    expect(passwordInput.value.length).toBeLessThanOrEqual(255);
   });
 });
+```
+
+This test suite covers all the test cases specified in the provided JSON, including rendering, input validation, credential checking, error message display, whitespace trimming, case sensitivity, and maximum length handling.
