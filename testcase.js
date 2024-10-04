@@ -1,6 +1,3 @@
-Here's the Jest test code for the Login component based on the provided test cases:
-
-```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -111,6 +108,3 @@ describe('Login component', () => {
     expect(passwordInput.value.length).toBeLessThanOrEqual(255);
   });
 });
-```
-
-This test suite covers all the test cases specified in the provided JSON, including rendering, input validation, credential checking, error message display, whitespace trimming, case sensitivity, and maximum length handling.
