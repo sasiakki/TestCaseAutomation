@@ -1,6 +1,3 @@
-Based on the provided code and test cases, here's the Jest test code for the Login component:
-
-```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -105,6 +102,3 @@ describe('Login component', () => {
     expect(screen.getByText('Login successful')).toBeInTheDocument();
   });
 });
-```
-
-This test suite covers all the scenarios mentioned in the provided test cases, including rendering the login form, input field functionality, form submission with valid and invalid credentials, and handling empty fields.
