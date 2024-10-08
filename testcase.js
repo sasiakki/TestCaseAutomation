@@ -1,53 +1,108 @@
+Here's the Jest test code for the login form based on the provided requirements:
+
+```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Login from './Login';
 
 describe('Login component', () => {
-  it('should render login form', () => {
-    const { getByLabelText, getByRole } = render(<Login />);
-    expect(getByLabelText('Username:')).toBeInTheDocument();
-    expect(getByLabelText('Password:')).toBeInTheDocument();
-    expect(getByRole('button', { name: 'Login' })).toBeInTheDocument();
+  it('renders login form correctly', () => {
+    render(<Login />);
+    expect(screen.getByLabelText('Username:')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password:')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
   });
 
-  it('should update input fields', () => {
-    const { getByLabelText } = render(<Login />);
-    const usernameInput = getByLabelText('Username:');
-    const passwordInput = getByLabelText('Password:');
-    fireEvent.change(usernameInput, { target: { value: 'admin' } });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
-    expect(usernameInput.value).toBe('admin');
-    expect(passwordInput.value).toBe('password123');
+  it('accepts input in username and password fields', () => {
+    render(<Login />);
+    const usernameInput = screen.getByLabelText('Username:');
+    const passwordInput = screen.getByLabelText('Password:');
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'testpass' } });
+    expect(usernameInput).toHaveValue('testuser');
+    expect(passwordInput).toHaveValue('testpass');
   });
 
-  it('should validate correct credentials', () => {
-    const { getByLabelText, getByRole } = render(<Login />);
-    const usernameInput = getByLabelText('Username:');
-    const passwordInput = getByLabelText('Password:');
-    const loginButton = getByRole('button', { name: 'Login' });
+  it('successfully logs in with valid credentials', () => {
+    render(<Login />);
+    const usernameInput = screen.getByLabelText('Username:');
+    const passwordInput = screen.getByLabelText('Password:');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
     fireEvent.change(usernameInput, { target: { value: 'admin' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
-    expect(/* mock success message or redirect */).toHaveBeenCalled();
+    expect(screen.getByText('Login successful')).toBeInTheDocument();
   });
 
-  it('should show error for incorrect credentials', () => {
-    const { getByLabelText, getByRole, getByText } = render(<Login />);
-    const usernameInput = getByLabelText('Username:');
-    const passwordInput = getByLabelText('Password:');
-    const loginButton = getByRole('button', { name: 'Login' });
+  it('fails login with invalid username', () => {
+    render(<Login />);
+    const usernameInput = screen.getByLabelText('Username:');
+    const passwordInput = screen.getByLabelText('Password:');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
+    fireEvent.change(usernameInput, { target: { value: 'wronguser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+    expect(screen.getByText('Invalid username or password')).toBeInTheDocument();
+  });
+
+  it('fails login with invalid password', () => {
+    render(<Login />);
+    const usernameInput = screen.getByLabelText('Username:');
+    const passwordInput = screen.getByLabelText('Password:');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
+    fireEvent.change(usernameInput, { target: { value: 'admin' } });
+    fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
+    fireEvent.click(loginButton);
+    expect(screen.getByText('Invalid username or password')).toBeInTheDocument();
+  });
+
+  it('fails login with both invalid username and password', () => {
+    render(<Login />);
+    const usernameInput = screen.getByLabelText('Username:');
+    const passwordInput = screen.getByLabelText('Password:');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
     fireEvent.change(usernameInput, { target: { value: 'wronguser' } });
     fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
     fireEvent.click(loginButton);
-    expect(getByText('Invalid username or password')).toBeInTheDocument();
+    expect(screen.getByText('Invalid username or password')).toBeInTheDocument();
   });
 
-  it('should show error for empty fields', () => {
-    const { getByRole, getByText } = render(<Login />);
-    const loginButton = getByRole('button', { name: 'Login' });
+  it('fails login with empty username field', () => {
+    render(<Login />);
+    const passwordInput = screen.getByLabelText('Password:');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
-    expect(getByText('Username is required')).toBeInTheDocument();
-    expect(getByText('Password is required')).toBeInTheDocument();
+    expect(screen.getByText('Username is required')).toBeInTheDocument();
+  });
+
+  it('fails login with empty password field', () => {
+    render(<Login />);
+    const usernameInput = screen.getByLabelText('Username:');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
+    fireEvent.change(usernameInput, { target: { value: 'admin' } });
+    fireEvent.click(loginButton);
+    expect(screen.getByText('Password is required')).toBeInTheDocument();
+  });
+
+  it('fails login with both fields empty', () => {
+    render(<Login />);
+    const loginButton = screen.getByRole('button', { name: 'Login' });
+    fireEvent.click(loginButton);
+    expect(screen.getByText('Username is required')).toBeInTheDocument();
+    expect(screen.getByText('Password is required')).toBeInTheDocument();
+  });
+
+  it('trims leading and trailing whitespace in username', () => {
+    render(<Login />);
+    const usernameInput = screen.getByLabelText('Username:');
+    const passwordInput = screen.getByLabelText('Password:');
+    const loginButton = screen.getByRole('button', { name: 'Login' });
+    fireEvent.change(usernameInput, { target: { value: '  admin  ' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+    expect(screen.getByText('Login successful')).toBeInTheDocument();
   });
 });
+```
