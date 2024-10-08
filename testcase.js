@@ -1,3 +1,6 @@
+Here's the Jest test code based on the provided test cases:
+
+```javascript
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -102,3 +105,6 @@ describe('Login component', () => {
     expect(screen.getByText('Login successful')).toBeInTheDocument();
   });
 });
+```
+
+This test suite covers all the scenarios described in the provided test cases, including rendering, input functionality, valid and invalid credentials, empty fields, and whitespace trimming.
